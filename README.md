@@ -103,13 +103,13 @@ conductor workflow search \
   | xargs -I{} conductor workflow retry {}
 ```
 
-## Use with Orkes Cloud
+## Use with Orkes Developer Edition
 
-Point the CLI at an [Orkes Developer Edition](https://orkes.io) cluster (free, no credit card) to unlock LLM tasks, MCP tool calling, and multi-agent orchestration:
+Point the CLI at an [Orkes Developer Edition](https://developer.orkescloud.com/) cluster (free, no credit card) to unlock LLM tasks and for a Cloud hosted developer version. 
 
 ```bash
 conductor config save --profile orkes-dev
-# Server URL:  https://your-cluster.orkesconductor.io/api
+# Server URL:  https://developer.orkescloud.com/api
 # Auth key:    your-key
 # Auth secret: your-secret
 # Server type: Enterprise
