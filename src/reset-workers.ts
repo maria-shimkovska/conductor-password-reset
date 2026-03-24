@@ -2,10 +2,10 @@ import { worker, TaskHandler, OrkesClients } from '@io-orkes/conductor-javascrip
 import type { Task } from '@io-orkes/conductor-javascript';
 import crypto from 'crypto';
 
-// Step 1: Invalidate any existing tokens for this email
-// (ensures there's never two valid tokens at the same time)
+// Step 1: invalidate any existing tokens for this email
+@worker({ taskDefName: 'invalidate_old_tokens' })
 async function invalidateOldTokens(task: Task) {
-  const { email } = task.inputData as { email: string };
+  const { email } = task.inputData;
   // Replace with your real DB call: DELETE FROM tokens WHERE email = ?
   console.log(`[CLEANUP] Cleared old tokens for ${email}`);
   return {
@@ -13,40 +13,33 @@ async function invalidateOldTokens(task: Task) {
     outputData: { cleaned: true },
   };
 }
-worker({ taskDefName: 'invalidate_old_tokens' })(invalidateOldTokens);
 
-// Step 2: Generate a new token and save it to the DB
-// This runs exactly once — retries of step 3 reuse this token
+// Step 2: generate a new token and save it
+@worker({ taskDefName: 'generate_reset_token' })
 async function generateResetToken(task: Task) {
-  const { email } = task.inputData as { email: string };
+  const { email } = task.inputData;
   const token = crypto.randomBytes(32).toString('hex');
   const expiresAt = Math.floor(Date.now() / 1000) + 3600; // 1 hour
   // Replace with your real DB write: INSERT INTO tokens ...
-  console.log(`[TOKEN] Generated for ${email}: ${token.slice(0, 8)}...`);
+  console.log(`[TOKEN] Generated for ${email}`);
   return {
     status: 'COMPLETED' as const,
     outputData: { token, expiresAt, email },
   };
 }
-worker({ taskDefName: 'generate_reset_token' })(generateResetToken);
 
-// Step 3: Send the reset email with the link
-// Receives the token from step 2 — never regenerates it on retry
+// Step 3: send the email with the reset link
+@worker({ taskDefName: 'send_reset_email', concurrency: 5 })
 async function sendResetEmail(task: Task) {
-  const { email, token } = task.inputData as { email: string; token: string };
-
-  // Uncomment to simulate an email provider outage and watch Conductor retry:
-  // throw new Error('Email provider returned 503 — service unavailable');
-
+  const { email, token } = task.inputData;
   const resetUrl = `https://myapp.com/reset?token=${token}`;
   // Replace with your real email provider: SendGrid, Resend, Postmark, etc.
-  console.log(`[EMAIL] Reset link sent to ${email}: ${resetUrl}`);
+  console.log(`[EMAIL] Reset link sent to ${email}`);
   return {
     status: 'COMPLETED' as const,
     outputData: { sent: true, resetUrl },
   };
 }
-worker({ taskDefName: 'send_reset_email', concurrency: 5 })(sendResetEmail);
 
 // Start polling for tasks
 // OrkesClients.from() reads CONDUCTOR_SERVER_URL from env (defaults to http://localhost:8080/api)
