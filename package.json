@@ -1,0 +1,19 @@
+{
+  "name": "conductor-password-reset",
+  "version": "1.0.0",
+  "description": "Password reset workflow demo using Conductor OSS CLI — companion project for 'The Conductor CLI' article",
+  "main": "dist/reset-workers.js",
+  "scripts": {
+    "start": "ts-node src/reset-workers.ts",
+    "build": "tsc",
+    "register": "ts-node src/register.ts"
+  },
+  "dependencies": {
+    "@io-orkes/conductor-javascript": "^3.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
+  }
+}

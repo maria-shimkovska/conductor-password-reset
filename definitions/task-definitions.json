@@ -1,0 +1,20 @@
+[
+  {
+    "name": "invalidate_old_tokens",
+    "retryCount": 3,
+    "timeoutSeconds": 30,
+    "responseTimeoutSeconds": 30
+  },
+  {
+    "name": "generate_reset_token",
+    "retryCount": 3,
+    "timeoutSeconds": 30,
+    "responseTimeoutSeconds": 30
+  },
+  {
+    "name": "send_reset_email",
+    "retryCount": 5,
+    "timeoutSeconds": 60,
+    "responseTimeoutSeconds": 60
+  }
+]
